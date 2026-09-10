@@ -12,16 +12,35 @@ export const palettes = {
 export type Palette = keyof typeof palettes;
 export type OrbState = 'idle' | 'listening' | 'thinking' | 'speaking';
 export type AtmosphereSettings = {
-  palette: Palette; distortion: number; swirl: number; grainMix: number;
-  grainOverlay: number; orbState: OrbState; glow: number;
+  palette: Palette;
+  distortion: number;
+  swirl: number;
+  grainMix: number;
+  grainOverlay: number;
+  orbState: OrbState;
+  glow: number;
 };
 export type AtmosphereProps = Partial<AtmosphereSettings> & {
-  variant?: 'gradient' | 'orb'; speed?: number; intensity?: number;
-  paused?: boolean; className?: string;
+  variant?: 'gradient' | 'orb';
+  speed?: number;
+  intensity?: number;
+  paused?: boolean;
+  className?: string;
 };
 
 // The export endpoint replaces only this JSON object, preserving the renderer.
-const defaults = /* ISSIOFY_DEFAULTS */ {"variant":"gradient","palette":"heather","distortion":65,"swirl":35,"grainMix":15,"grainOverlay":12,"orbState":"idle","glow":65,"speed":1,"intensity":65} /* END_DEFAULTS */;
+const defaults = /* ISSIOFY_DEFAULTS */ {
+  variant: 'gradient',
+  palette: 'heather',
+  distortion: 65,
+  swirl: 35,
+  grainMix: 15,
+  grainOverlay: 12,
+  orbState: 'idle',
+  glow: 65,
+  speed: 1,
+  intensity: 65,
+}; /* END_DEFAULTS */
 
 const vertex = `
 attribute vec2 a_position;
@@ -100,79 +119,222 @@ void main() {
 export default function Atmosphere(props: AtmosphereProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   const live = useRef(props);
-  useEffect(() => { live.current = props; }, [props]);
   useEffect(() => {
-    const canvas=ref.current;
-    if(!canvas) return;
-    let animation=0, visible=true, lost=false, width=0, height=0, time=0, previous=0, lastDraw=0, dirty=true;
-    const motion=matchMedia('(prefers-reduced-motion: reduce)');
-    const gl=canvas.getContext('webgl',{alpha:true,antialias:false,premultipliedAlpha:false,powerPreference:'low-power'});
-    const fallback=() => {
-      const values={...defaults,...live.current};
-      const p=palettes[values.palette as Palette] || palettes.heather;
-      const orb=values.variant==='orb';
-      canvas.style.background=orb
-        ? 'radial-gradient(circle at 42% 37%, '+p.colors[1]+' 0%, #090811 36%, transparent 37%)'
-        : 'radial-gradient(ellipse at 25% 20%, '+p.colors[0]+', '+p.colors[1]+' 45%, '+p.colors[2]+')';
+    live.current = props;
+  }, [props]);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    let animation = 0,
+      visible = true,
+      lost = false,
+      width = 0,
+      height = 0,
+      time = 0,
+      previous = 0,
+      lastDraw = 0,
+      dirty = true;
+    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    const gl = canvas.getContext('webgl', {
+      alpha: true,
+      antialias: false,
+      premultipliedAlpha: false,
+      powerPreference: 'low-power',
+    });
+    const fallback = () => {
+      const values = { ...defaults, ...live.current };
+      const p = palettes[values.palette as Palette] || palettes.heather;
+      const orb = values.variant === 'orb';
+      canvas.style.background = orb
+        ? 'radial-gradient(circle at 42% 37%, ' +
+          p.colors[1] +
+          ' 0%, #090811 36%, transparent 37%)'
+        : 'radial-gradient(ellipse at 25% 20%, ' +
+          p.colors[0] +
+          ', ' +
+          p.colors[1] +
+          ' 45%, ' +
+          p.colors[2] +
+          ')';
     };
-    if(!gl) {fallback();return;}
-    const shader=(type:number,text:string) => {
-      const s=gl.createShader(type); if(!s) throw new Error('Shader unavailable');
-      gl.shaderSource(s,text);gl.compileShader(s);
-      if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){gl.deleteShader(s);throw new Error('Shader compilation failed');}
+    if (!gl) {
+      fallback();
+      return;
+    }
+    const shader = (type: number, text: string) => {
+      const s = gl.createShader(type);
+      if (!s) throw new Error('Shader unavailable');
+      gl.shaderSource(s, text);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        gl.deleteShader(s);
+        throw new Error('Shader compilation failed');
+      }
       return s;
     };
-    let program:WebGLProgram|null=null, buffer:WebGLBuffer|null=null;
-    let vertexShader:WebGLShader|null=null, fragmentShader:WebGLShader|null=null;
-    const cleanup=() => {if(buffer)gl.deleteBuffer(buffer);if(program)gl.deleteProgram(program);if(vertexShader)gl.deleteShader(vertexShader);if(fragmentShader)gl.deleteShader(fragmentShader);};
+    let program: WebGLProgram | null = null,
+      buffer: WebGLBuffer | null = null;
+    let vertexShader: WebGLShader | null = null,
+      fragmentShader: WebGLShader | null = null;
+    const cleanup = () => {
+      if (buffer) gl.deleteBuffer(buffer);
+      if (program) gl.deleteProgram(program);
+      if (vertexShader) gl.deleteShader(vertexShader);
+      if (fragmentShader) gl.deleteShader(fragmentShader);
+    };
     try {
-      vertexShader=shader(gl.VERTEX_SHADER,vertex);
-      fragmentShader=shader(gl.FRAGMENT_SHADER,fragment);
-      program=gl.createProgram(); if(!program)throw new Error('Program unavailable');
-      gl.attachShader(program,vertexShader);gl.attachShader(program,fragmentShader);gl.linkProgram(program);
-      if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error('Shader link failed');
+      vertexShader = shader(gl.VERTEX_SHADER, vertex);
+      fragmentShader = shader(gl.FRAGMENT_SHADER, fragment);
+      program = gl.createProgram();
+      if (!program) throw new Error('Program unavailable');
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+        throw new Error('Shader link failed');
       // oxlint-disable-next-line react/react-compiler -- WebGL useProgram is a graphics API, not a React hook.
-      gl.useProgram(program);buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
-      gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
-      const position=gl.getAttribLocation(program,'a_position');gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
-    }catch{cleanup();fallback();return;}
-    const uniforms=Object.fromEntries(['resolution','time','mode','distortion','swirl','grainMix','grainOverlay','state','glow','intensity','light','mid','dark'].map(name=>[name,gl.getUniformLocation(program!,'u_'+name)]));
-    let lastSettings='';
-    const draw=() => {
-      if(!width||!height||lost)return;
-      const settings={...defaults,...live.current};
-      const p=palettes[settings.palette as Palette] || palettes.heather;
-      const rgb=(hex:string)=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
-      gl.uniform2f(uniforms.resolution,width,height);
-      gl.uniform1f(uniforms.time,time);
-      gl.uniform1f(uniforms.mode,settings.variant==='orb'?1:0);
-      gl.uniform1f(uniforms.state,Math.max(0,['idle','listening','thinking','speaking'].indexOf(settings.orbState)));
-      for(const key of ['distortion','swirl','grainMix','grainOverlay','glow','intensity'] as const)gl.uniform1f(uniforms[key],settings[key]/100);
-      gl.uniform3fv(uniforms.light,rgb(p.colors[0]));gl.uniform3fv(uniforms.mid,rgb(p.colors[1]));gl.uniform3fv(uniforms.dark,rgb(p.colors[2]));
-      gl.drawArrays(gl.TRIANGLES,0,6);
+      gl.useProgram(program);
+      buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+        gl.STATIC_DRAW,
+      );
+      const position = gl.getAttribLocation(program, 'a_position');
+      gl.enableVertexAttribArray(position);
+      gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+    } catch {
+      cleanup();
+      fallback();
+      return;
+    }
+    const uniforms = Object.fromEntries(
+      [
+        'resolution',
+        'time',
+        'mode',
+        'distortion',
+        'swirl',
+        'grainMix',
+        'grainOverlay',
+        'state',
+        'glow',
+        'intensity',
+        'light',
+        'mid',
+        'dark',
+      ].map((name) => [name, gl.getUniformLocation(program!, 'u_' + name)]),
+    );
+    let lastSettings = '';
+    const draw = () => {
+      if (!width || !height || lost) return;
+      const settings = {
+        ...defaults,
+        ...Object.fromEntries(
+          Object.entries(live.current).filter(([, v]) => v !== undefined),
+        ),
+      } as typeof defaults & AtmosphereProps;
+      const p = palettes[settings.palette as Palette] || palettes.heather;
+      const rgb = (hex: string) =>
+        [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+      gl.uniform2f(uniforms.resolution, width, height);
+      gl.uniform1f(uniforms.time, time);
+      gl.uniform1f(uniforms.mode, settings.variant === 'orb' ? 1 : 0);
+      gl.uniform1f(
+        uniforms.state,
+        Math.max(
+          0,
+          ['idle', 'listening', 'thinking', 'speaking'].indexOf(
+            settings.orbState,
+          ),
+        ),
+      );
+      for (const key of [
+        'distortion',
+        'swirl',
+        'grainMix',
+        'grainOverlay',
+        'glow',
+        'intensity',
+      ] as const)
+        gl.uniform1f(uniforms[key], settings[key] / 100);
+      gl.uniform3fv(uniforms.light, rgb(p.colors[0]));
+      gl.uniform3fv(uniforms.mid, rgb(p.colors[1]));
+      gl.uniform3fv(uniforms.dark, rgb(p.colors[2]));
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
-    const resize=new ResizeObserver(()=>{
-      const rect=canvas.getBoundingClientRect();const ratio=Math.min(devicePixelRatio||1,1.5);
-      width=Math.round(rect.width*ratio);height=Math.round(rect.height*ratio);canvas.width=width;canvas.height=height;gl.viewport(0,0,width,height);dirty=true;
+    const resize = new ResizeObserver(() => {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = Math.min(devicePixelRatio || 1, 1.5);
+      width = Math.round(rect.width * ratio);
+      height = Math.round(rect.height * ratio);
+      canvas.width = width;
+      canvas.height = height;
+      gl.viewport(0, 0, width, height);
+      dirty = true;
     });
-    const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});
-    const onLost=(event:Event)=>{event.preventDefault();lost=true;fallback();};
-    canvas.addEventListener('webglcontextlost',onLost);
-    const tick=(now:number)=>{
-      const settings={...defaults,...live.current};
-      const key=JSON.stringify(settings);
-      if(key!==lastSettings){dirty=true;lastSettings=key;}
-      if(visible&&!document.hidden&&!lost&&!settings.paused&&!motion.matches)time+=Math.min(now-previous,40)*.001*settings.speed;
-      if(visible&&!document.hidden&&!lost&&(dirty||(!settings.paused&&!motion.matches))&&now-lastDraw>=32) {
-        draw();dirty=false;lastDraw=now;
-      }
-      previous=now;animation=requestAnimationFrame(tick);
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      dirty = true;
+    });
+    const onLost = (event: Event) => {
+      event.preventDefault();
+      lost = true;
+      fallback();
     };
-    resize.observe(canvas);observer.observe(canvas);
-    if (live.current.paused || motion.matches) { draw(); } else animation=requestAnimationFrame(tick);
-    return()=>{cancelAnimationFrame(animation);resize.disconnect();observer.disconnect();canvas.removeEventListener('webglcontextlost',onLost);cleanup();};
-  },[]);
-  return <canvas ref={ref} className={props.className} aria-hidden="true" style={{width:'100%',height:'100%',display:'block'}}/>;
+    canvas.addEventListener('webglcontextlost', onLost);
+    const tick = (now: number) => {
+      const settings = {
+        ...defaults,
+        ...Object.fromEntries(
+          Object.entries(live.current).filter(([, v]) => v !== undefined),
+        ),
+      } as typeof defaults & AtmosphereProps;
+      const key = JSON.stringify(settings);
+      if (key !== lastSettings) {
+        dirty = true;
+        lastSettings = key;
+      }
+      if (
+        visible &&
+        !document.hidden &&
+        !lost &&
+        !settings.paused &&
+        !motion.matches
+      )
+        time += Math.min(now - previous, 40) * 0.001 * settings.speed;
+      if (
+        visible &&
+        !document.hidden &&
+        !lost &&
+        (dirty || (!settings.paused && !motion.matches)) &&
+        now - lastDraw >= 32
+      ) {
+        draw();
+        dirty = false;
+        lastDraw = now;
+      }
+      previous = now;
+      animation = requestAnimationFrame(tick);
+    };
+    resize.observe(canvas);
+    observer.observe(canvas);
+    animation = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(animation);
+      resize.disconnect();
+      observer.disconnect();
+      canvas.removeEventListener('webglcontextlost', onLost);
+      cleanup();
+    };
+  }, []);
+  return (
+    <canvas
+      ref={ref}
+      className={props.className}
+      aria-hidden="true"
+      style={{ width: '100%', height: '100%', display: 'block' }}
+    />
+  );
 }
-
-

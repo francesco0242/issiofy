@@ -140,34 +140,6 @@ export default function BorderBeam({
           b = h - 2 * r,
           q = (Math.PI * r) / 2,
           total = 2 * a + 2 * b + 4 * q;
-        function point(distance: number) {
-          let d = ((distance % total) + total) % total;
-          if (d < a) return [r + d, 0];
-          d -= a;
-          if (d < q) {
-            const t = -Math.PI / 2 + d / Math.max(r, 0.001);
-            return [w - r + Math.cos(t) * r, r + Math.sin(t) * r];
-          }
-          d -= q;
-          if (d < b) return [w, r + d];
-          d -= b;
-          if (d < q) {
-            const t = d / Math.max(r, 0.001);
-            return [w - r + Math.cos(t) * r, h - r + Math.sin(t) * r];
-          }
-          d -= q;
-          if (d < a) return [w - r - d, h];
-          d -= a;
-          if (d < q) {
-            const t = Math.PI / 2 + d / Math.max(r, 0.001);
-            return [r + Math.cos(t) * r, h - r + Math.sin(t) * r];
-          }
-          d -= q;
-          if (d < b) return [0, h - r - d];
-          d -= b;
-          const t = Math.PI + d / Math.max(r, 0.001);
-          return [r + Math.cos(t) * r, r + Math.sin(t) * r];
-        }
         if (total > 0) {
           const power = Math.max(
             0,
@@ -200,39 +172,36 @@ export default function BorderBeam({
               (i) => parseInt(full.slice(i, i + 2), 16) || 0,
             );
           });
-          const length =
-            total * (s.size === 'line' ? 0.48 : s.size === 'sm' ? 0.3 : 0.38);
-          const head = (time / 4.3) * total;
+          const phase = (time / 5.8) * Math.PI * 2;
+          const gradient = ctx!.createConicGradient(
+            phase,
+            pad + width / 2,
+            pad + height / 2,
+          );
+          const rgba = (n: number, alpha: number) =>
+            'rgba(' + rgb[n].join(',') + ',' + alpha + ')';
+          gradient.addColorStop(0, rgba(0, 0));
+          gradient.addColorStop(0.12, rgba(0, 0.12));
+          gradient.addColorStop(0.27, rgba(0, 0.65));
+          gradient.addColorStop(0.38, rgba(1, 1));
+          gradient.addColorStop(0.44, rgba(2, 0.8));
+          gradient.addColorStop(0.5, rgba(2, 0));
+          gradient.addColorStop(1, rgba(2, 0));
+          const path = new Path2D();
+          path.roundRect(pad + 0.5, pad + 0.5, w, h, r);
           const pulse = s.size.startsWith('pulse')
-            ? 0.7 + 0.3 * Math.sin(time * 2)
+            ? 0.8 + 0.2 * Math.sin(time * 2)
             : 1;
-          for (let layer = 0; layer < 2; layer++) {
-            ctx!.lineWidth = layer === 0 ? 5 : 1.25;
-            ctx!.lineCap = 'round';
-            ctx!.shadowBlur = layer === 0 ? 10 : 0;
-            const steps = Math.min(180, Math.max(64, Math.ceil(length / 2)));
-            for (let i = 0; i < steps; i++) {
-              const u = i / steps,
-                envelope = Math.pow(Math.sin(Math.PI * u), 1.7) * power * pulse;
-              const p = point(head - length + u * length),
-                n = point(head - length + ((i + 1) / steps) * length);
-              const stop = Math.min(1, Math.floor(u * 2)),
-                blend = u * 2 - stop;
-              const col =
-                'rgb(' +
-                rgb[stop]
-                  .map((v, j) => Math.round(v + (rgb[stop + 1][j] - v) * blend))
-                  .join(',') +
-                ')';
-              ctx!.globalAlpha = envelope * (layer === 0 ? 0.18 : 0.95);
-              ctx!.strokeStyle = col;
-              ctx!.shadowColor = col;
-              ctx!.beginPath();
-              ctx!.moveTo(p[0] + pad + 0.5, p[1] + pad + 0.5);
-              ctx!.lineTo(n[0] + pad + 0.5, n[1] + pad + 0.5);
-              ctx!.stroke();
-            }
-          }
+          ctx!.strokeStyle = gradient;
+          ctx!.shadowBlur = 0;
+          ctx!.filter = 'blur(5px)';
+          ctx!.lineWidth = s.size === 'line' ? 2 : 7;
+          ctx!.globalAlpha = power * 0.55 * pulse;
+          ctx!.stroke(path);
+          ctx!.filter = 'none';
+          ctx!.lineWidth = s.size === 'sm' ? 1.5 : 2;
+          ctx!.globalAlpha = Math.min(1, power * 1.4) * pulse;
+          ctx!.stroke(path);
           ctx!.globalAlpha = 1;
           ctx!.shadowBlur = 0;
         }
