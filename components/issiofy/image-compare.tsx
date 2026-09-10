@@ -1,3 +1,4 @@
+/* oxlint-disable next/no-img-element -- Standalone React component; no Next.js runtime dependency. */
 'use client';
 import { useState, useId, type CSSProperties } from 'react';
 export type ImageCompareProps = {

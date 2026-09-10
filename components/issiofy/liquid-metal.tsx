@@ -135,6 +135,7 @@ export default function LiquidMetal({
       shaders.forEach((s) => gl.attachShader(program!, s));
       gl.linkProgram(program);
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw Error('link');
+      // oxlint-disable-next-line react/react-compiler -- WebGL API, not a React hook.
       gl.useProgram(program);
       buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -262,7 +263,7 @@ export default function LiquidMetal({
   return (
     <>
       <style>{`
- .im-metal{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 26px;border:0;border-radius:18px;background:linear-gradient(155deg,#fafcff,#919daa 45%,#f4f7fb 75%,#727e8c);color:#0b1118;font:600 14px/1.3 inherit;cursor:pointer;box-shadow:0 9px 24px #0004,inset 0 0 0 1px #fff6;transition:transform .2s,box-shadow .2s;max-width:100%}
+ .im-metal{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 26px;border:0;border-radius:18px;background:linear-gradient(155deg,#fafcff,#919daa 45%,#f4f7fb 75%,#727e8c);color:#0b1118;font-family:inherit;font-size:14px;font-weight:600;line-height:1.3;box-sizing:border-box;min-width:0;flex-shrink:0;cursor:pointer;box-shadow:0 9px 24px #0004,inset 0 0 0 1px #fff6;transition:transform .2s,box-shadow .2s;max-width:100%}
  .im-metal[data-variant=solid][data-metal-ready=true]{background:transparent}
  .im-metal[data-variant=rim]{background:#191a1e;color:#f6f7fa;box-shadow:inset 0 0 0 1px #7b818b}
  .im-metal[data-shape=circle]{width:54px;height:54px;padding:0;border-radius:999px}
@@ -272,7 +273,7 @@ export default function LiquidMetal({
  .im-metal:focus-visible{outline:2px solid #a6bfff;outline-offset:5px}
  .im-metal:disabled{opacity:.5;cursor:not-allowed}
  .im-metal>canvas{position:absolute;left:-12px;top:-12px;width:calc(100% + 24px);height:calc(100% + 24px);z-index:0;pointer-events:none}
- .im-metal-label{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:10px;text-shadow:0 1px 0 #fff5}
+ .im-metal-label{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-width:0;overflow-wrap:anywhere;text-shadow:0 1px 0 #fff8}
  .im-metal[data-variant=rim] .im-metal-label{text-shadow:none}
  @media(prefers-reduced-motion:reduce){.im-metal{transition:none}.im-metal:hover{transform:none}}
  `}</style>
