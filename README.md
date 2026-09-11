@@ -10,7 +10,7 @@ Free React components for motion, AI interfaces, code examples and everyday prod
 
 [![License](https://img.shields.io/github/license/francesco0242/issiofy?style=flat-square&color=a779ff&labelColor=18181b&label=license)](./LICENSE)
 [![Stars](https://img.shields.io/github/stars/francesco0242/issiofy?style=flat-square&color=a779ff&labelColor=18181b&logo=github&logoColor=white&label=stars)](https://github.com/francesco0242/issiofy/stargazers)
-[![Components](https://img.shields.io/badge/-16-a779ff?style=flat-square&color=a779ff&labelColor=18181b&label=components)](https://issiofy.com/#components)
+[![Components](https://img.shields.io/badge/-22-a779ff?style=flat-square&color=a779ff&labelColor=18181b&label=components)](https://issiofy.com/#components)
 [![React](https://img.shields.io/badge/-19-a779ff?style=flat-square&color=a779ff&labelColor=18181b&logo=react&logoColor=white&label=react)](https://react.dev)
 
 **[🌐 Live previews](https://issiofy.com)** · **[⚡ Quick start](#install)** · **[🎛️ Studio](https://issiofy.com/#components)** · **[🤖 llms.txt](https://issiofy.com/llms.txt)**
@@ -40,6 +40,12 @@ Swap `beam` for any id from the table below. Or just copy the file out of
 | --- | --- | --- | --- |
 | **[AI Chat](https://issiofy.com/components/ai-chat)** | A full agent conversation — streaming replies, tool calls and voice. | `AIChat` | `ai-chat.tsx` |
 | **[Border Beam](https://issiofy.com/components/beam)** | An animated gradient border for cards, buttons and inputs. | `BorderBeam` | `border-beam.tsx` |
+| **[Spotlight Card](https://issiofy.com/components/spotlight-card)** | A soft pointer-following light that brings cards and their edges into focus. | `SpotlightCard` | `spotlight-card.tsx` |
+| **[Text Reveal](https://issiofy.com/components/text-reveal)** | Words and lines arrive with a soft blur, a gentle rise and considered timing. | `TextReveal` | `text-reveal.tsx` |
+| **[Expandable Cards](https://issiofy.com/components/expandable-cards)** | Open a project in place, with flowing artwork, titles and details. | `ExpandableCards` | `expandable-cards.tsx` |
+| **[Magnetic Button](https://issiofy.com/components/magnetic-button)** | A springy call to action with a magnetic surface and a fixed click target. | `MagneticButton` | `magnetic-button.tsx` |
+| **[Image Ripple](https://issiofy.com/components/image-ripple)** | A touch sends a wave through the image, like light across water. | `ImageRipple` | `image-ripple.tsx` |
+| **[Workflow Steps](https://issiofy.com/components/workflow-steps)** | A readable, animated pipeline for agents, jobs and multi-step tasks. | `WorkflowSteps` | `workflow-steps.tsx` |
 | **[Liquid Metal](https://issiofy.com/components/metal)** | A cursor-reactive metallic surface for buttons, badges and controls. | `LiquidMetal` | `liquid-metal.tsx` |
 | **[Holographic Card](https://issiofy.com/components/hologram)** | A foil surface that follows your pointer with depth and shifting light. | `Visual` | `interaction.tsx` |
 | **[Audio Equalizer](https://issiofy.com/components/equalizer)** | Smooth audio bars for voice agents, players and live input. | `Visual` | `interaction.tsx` |
@@ -56,7 +62,7 @@ Swap `beam` for any id from the table below. Or just copy the file out of
 | **[Silk](https://issiofy.com/components/silk)** | A rippling silk sheet with soft specular folds. | `Visual` | `visual.tsx` |
 
 > `visual.tsx` carries five background variants and `atmosphere.tsx` the
-> gradient, which is why 16 components live in 11 files.
+> gradient, which is why 22 components live in 17 files.
 
 ## Usage
 
