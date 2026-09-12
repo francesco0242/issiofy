@@ -9,9 +9,13 @@
 Free React components for motion, AI interfaces, code examples and everyday product workflows.
 
 [![License](https://img.shields.io/github/license/francesco0242/issiofy?style=flat-square&color=a779ff&labelColor=18181b&label=license)](./LICENSE)
+[![Installs](https://img.shields.io/endpoint?url=https%3A%2F%2Fissiofy.com%2Fapi%2Fbadges%2Finstalls&style=flat-square&labelColor=18181b)](https://issiofy.com/#components)
 [![Stars](https://img.shields.io/github/stars/francesco0242/issiofy?style=flat-square&color=a779ff&labelColor=18181b&logo=github&logoColor=white&label=stars)](https://github.com/francesco0242/issiofy/stargazers)
 [![Components](https://img.shields.io/badge/-22-a779ff?style=flat-square&color=a779ff&labelColor=18181b&label=components)](https://issiofy.com/#components)
 [![React](https://img.shields.io/badge/-19-a779ff?style=flat-square&color=a779ff&labelColor=18181b&logo=react&logoColor=white&label=react)](https://react.dev)
+
+Installs counted from real `npx shadcn add` requests only — a page view or a
+curious click doesn't move this number.
 
 **[🌐 Live previews](https://issiofy.com)** · **[⚡ Quick start](#install)** · **[🎛️ Studio](https://issiofy.com/#components)** · **[🤖 llms.txt](https://issiofy.com/llms.txt)**
 
